@@ -12,6 +12,10 @@ Sior Consulting Ltd. (https://siorconsulting.com/) supported the development of 
 
 ## Setup and Installation
 
+Install Jupyter Lab via conda:
+
+    conda install -c conda-forge jupyterlab
+
 Clone or download this repository from
 [GitHub](https://github.com/siorconsulting/nrip-jamaica):
 
