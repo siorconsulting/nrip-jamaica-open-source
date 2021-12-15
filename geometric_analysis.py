@@ -5,7 +5,7 @@ import geopandas as gpd
 # import whitebox
 # wbt = whitebox.WhiteboxTools()
 
-wbt = wbt_setup(verbose=True) 
+wbt = wbt_setup(verbose=False) 
 
 __all__ = ['intersect', # NOT TESTED
            'zonal_statistics', # NOT TESTED
