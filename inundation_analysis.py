@@ -3,9 +3,9 @@ from wbt_utils import *
 
 wbt = wbt_setup()
 
-__all__ = ['InundationExtents']
+__all__ = ['inundation_extents']
 
-def InundationExtents(input_raster, output_polygons, threshold):
+def inundation_extents(input_raster, output_polygons, threshold):
     """
     Calculates inundation extents based on specific threshold
     
