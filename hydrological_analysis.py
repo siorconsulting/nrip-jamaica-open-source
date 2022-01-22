@@ -3,9 +3,9 @@ from wbt_utils import *
 
 wbt = wbt_setup()
 
-__all__ = ['HydrologicalRouting']
+__all__ = ['hydrological_routing']
 
-def ClippingByElevation(dem, output_clipped_dem):
+def clipping_by_elevation(dem, output_clipped_dem):
     '''
     Clips the dem boundary based on specific threshold
 
@@ -28,7 +28,7 @@ def ClippingByElevation(dem, output_clipped_dem):
                                 false="null")
 
 
-def HydrologicalRouting(dem, output_prefix, facc_threshold=1000, remove_temp_outputs=True):
+def hydrological_routing(dem, output_prefix, facc_threshold=1000, remove_temp_outputs=True):
 
 
     """
