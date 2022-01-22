@@ -18,7 +18,7 @@ __all__ = ['intersect', # NOT TESTED
            'hotspots_from_polygons', # TESTED
            'hotspots_from_raster', # TESTED
            'interpolate_points', # NOT TESTED 
-           'SummarizeWithin', # NOT TESTED
+           'summarize_within', # NOT TESTED
           ]
 
 def intersect(input_vector_file, overlay, output_vector_file):
@@ -315,7 +315,7 @@ def interpolate_points(input_points, field, output_raster):
     """
     wbt.radial_basis_function_interpolation(field, i=input_points, output=output_raster) # interpolation function
 
-def SummarizeWithin(input_vector, feature_polygons, output_polygon, field_to_summarize=None, aggfunc='mean'):
+def summarize_within(input_vector, feature_polygons, output_polygon, field_to_summarize=None, aggfunc='mean'):
     """
     Summarizies vector data relative to existing polygons
 
