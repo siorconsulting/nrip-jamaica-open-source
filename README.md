@@ -53,3 +53,5 @@ Toolsets are currently implemented using whitebox and geopandas.
 ### Example notebook on Google Colab
 
 Link to Colab notebook: https://colab.research.google.com/drive/1GjPS-aYbshqJlh5eYuFvNsh488_z2FFQ?usp=sharing
+
+Main NRIP project repository: https://github.com/siorconsulting/nrip-jamaica.git
