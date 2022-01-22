@@ -3,11 +3,11 @@ from wbt_utils import *
 
 wbt = wbt_setup()
 
-__all__ = ['SteepAreas',
-           'GeomorphologicalFluvialFloodHazardAreas',
+__all__ = ['steep_areas',
+           'geomorphological_fluvial_flood_hazard_areas',
            ]
 
-def GeomorphologicalFluvialFloodHazardAreas(dem, output_prefix, buffer_distance, facc_threshold = 1000, remove_temp_outputs = True):
+def geomorphological_fluvial_flood_hazard_areas(dem, output_prefix, buffer_distance, facc_threshold = 1000, remove_temp_outputs = True):
     """
     Calculates Flood hazard areas from raster and outputs these areas as polygons
     
@@ -46,7 +46,7 @@ def GeomorphologicalFluvialFloodHazardAreas(dem, output_prefix, buffer_distance,
         os.remove(os.path.join(wbt.work_dir,out_facc_setnull_buffer))
         
 
-def SteepAreas(dem, threshold, output_prefix, delete_temp_outputs=True):
+def steep_areas(dem, threshold, output_prefix, delete_temp_outputs=True):
     """Create mask of areas with slope equal or higher than a threshold, and export as raster and vector files.
     
     Inputs:
