@@ -6,6 +6,7 @@ import geopandas as gpd
 # wbt = whitebox.WhiteboxTools()
 
 wbt = wbt_setup(verbose=False) 
+wokring_dir = wbt.work_dir
 
 __all__ = ['intersect', # NOT TESTED
            'zonal_statistics', # NOT TESTED
@@ -33,7 +34,10 @@ def intersect(input_vector_file, overlay, output_vector_file):
     Outputs:
         output_vector_file: shapefile  <-- output vector shapefile
     """
+   
     wbt.intersect(input_vector_file, overlay, output_vector_file)
+    
+    wbt.work_dir = working_dir
     os.chdir(wbt.work_dir)
 
 def zonal_statistics(input_raster, input_zones, output_raster, field='FID', stat='mean', input_zones_is_raster=True):
