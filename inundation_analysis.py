@@ -2,6 +2,8 @@ import os
 from utils import *
 
 wbt = wbt_setup()
+working_dir = wbt.work_dir
+
 
 __all__ = ['inundation_extents']
 
@@ -23,12 +25,18 @@ def inundation_extents(input_raster, output_polygons, threshold):
 
     output_raster = 'temp_raster_inundation_extents.tif' # string of temporary raster file
     
+    wbt.work_dir = working_dir
+
     wbt.conditional_evaluation(i=input_raster, # string raster input from argugment of function
                                output=output_raster, # assigning temporary raster file string as output raster
                                statement=f"value <= {threshold}", # conditional Rust statement
                                true = 1, # assigned value of gird cell if condition is met
                                false = 'null') # assigned value of grid cell if condition is not met
+    
+    wbt.work_dir = working_dir
 
     wbt.raster_to_vector_polygons(i=output_raster, output=output_polygons) # converts temporary raster file to vector of polygon type
 
+    wbt.work_dir = working_dir
+    
     os.remove(os.path.join(wbt.work_dir, output_raster)) # removes temporary raster file 
