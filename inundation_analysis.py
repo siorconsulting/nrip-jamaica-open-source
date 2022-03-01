@@ -36,11 +36,11 @@ def inundation_extents(input_raster, output_polygons, threshold):
     
     wbt.work_dir = working_dir
 
-    wbt.raster_to_vector_polygons(i=output_raster, output=output_polygons) # converts temporary raster file to vector of polygon type
+    # wbt.raster_to_vector_polygons(i=output_raster, output=output_polygons) # converts temporary raster file to vector of polygon type
 
-    wbt.work_dir = working_dir
+    # wbt.work_dir = working_dir
     
-    os.remove(os.path.join(wbt.work_dir, output_raster)) # removes temporary raster file 
+    # os.remove(os.path.join(wbt.work_dir, output_raster)) # removes temporary raster file 
 
 
 
