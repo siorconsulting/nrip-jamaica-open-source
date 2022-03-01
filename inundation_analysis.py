@@ -1,12 +1,18 @@
 import os
 from utils import *
 
-wbt = wbt_setup()
+wbt = wbt_setup(verbose=True)
 working_dir = wbt.work_dir
 
 
 __all__ = ['inundation_extents',
-           'inundation_extents_between']
+           'inundation_extents_between','print_work_dir','set_work_dir']
+
+def print_work_dir():
+    print(wbt.work_dir)
+
+def set_work_dir(working_dir):
+    wbt.work_dir = working_dir
 
 def inundation_extents(input_raster, threshold, output_name=None, output_raster_flag=True, output_polygons_flag=False):
     """
@@ -67,7 +73,7 @@ def inundation_extents_between(input_raster, low_threshold, high_threshold, outp
     """
 
     if output_name is None:
-        output_name = f'inundation_extents_{threshold}'
+        output_name = f'inundation_extents_between_{low_threshold}_and_{high_threshold}'
 
     output_raster_name = f'{output_name}.tif' # string of temporary raster file
     output_polygons_name = f'{output_name}.shp' 
