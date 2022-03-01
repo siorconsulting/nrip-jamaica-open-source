@@ -4,7 +4,6 @@ from utils import *
 wbt = wbt_setup(verbose=True)
 working_dir = wbt.work_dir
 
-
 __all__ = ['inundation_extents',
            'inundation_extents_between',
            'print_work_dir',
@@ -62,8 +61,6 @@ def inundation_extents(input_raster, threshold, output_name=None, output_raster_
     
     if not(output_raster_flag):
         os.remove(os.path.join(wbt.work_dir, output_raster_name)) # removes temporary raster file 
-
-
 
 def inundation_extents_between(input_raster, low_threshold, high_threshold, output_name=None, output_raster_flag=True, output_polygons_flag=False, value=1):
     """
