@@ -6,7 +6,13 @@ working_dir = wbt.work_dir
 
 
 __all__ = ['inundation_extents',
-           'inundation_extents_between','print_work_dir','set_work_dir']
+           'inundation_extents_between',
+           'print_work_dir',
+           'set_work_dir',
+           'set_verbose_mode']
+
+def set_verbose_mode(verbose_mode=False):
+    wbt.verbose = verbose_mode
 
 def print_work_dir():
     print(wbt.work_dir)
@@ -20,16 +26,14 @@ def inundation_extents(input_raster, threshold, output_name=None, output_raster_
     
     Inputs:
         input_raster: str <-- path to raster(.tif) file
-        threshold : 
-        output_name : 
-        output_raster_flag : 
-        output_polygons_flag : 
-        value :
-        output_polygons: str <-- name for polygons(.shp) file outputted from raster to vector polygons calculation
-        threshold: int or float <-- max threshold value
+        threshold : int or float <-- threshold value
+        output_name : str <-- name of output files without extension (e.g., .shp or .tif)
+        output_raster_flag : boolean <-- if True, it exports the output in raster format
+        output_polygons_flag : boolean <-- if True, it exports the output in polygon format
+        value : int <-- hazard score value
     
     Outputs:
-        output: str <-- Outputted vector polygon(.shp) file name
+        output: str <-- Output raster (.tif) or vector polygon (.shp) file name
     
     Returns:
     None
@@ -67,11 +71,15 @@ def inundation_extents_between(input_raster, low_threshold, high_threshold, outp
     
     Inputs:
         input_raster: str <-- path to raster(.tif) file
-        output_polygons: str <-- name for polygons(.shp) file outputted from raster to vector polygons calculation
-        threshold: int or float <-- max threshold value
+        low_threshold : int or float <-- low threshold value
+        high_threshold : int or float <-- high threshold value
+        output_name : str <-- name of output files without extension (e.g., .shp or .tif)
+        output_raster_flag : boolean <-- if True, it exports the output in raster format
+        output_polygons_flag : boolean <-- if True, it exports the output in polygon format
+        value : int <-- hazard score value
     
     Outputs:
-        output: str <-- Outputted vector polygon(.shp) file name
+        output: str <-- Output raster (.tif) or vector polygon (.shp) file name
     
     Returns:
     None
