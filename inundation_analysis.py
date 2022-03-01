@@ -20,6 +20,11 @@ def inundation_extents(input_raster, threshold, output_name=None, output_raster_
     
     Inputs:
         input_raster: str <-- path to raster(.tif) file
+        threshold : 
+        output_name : 
+        output_raster_flag : 
+        output_polygons_flag : 
+        value :
         output_polygons: str <-- name for polygons(.shp) file outputted from raster to vector polygons calculation
         threshold: int or float <-- max threshold value
     
