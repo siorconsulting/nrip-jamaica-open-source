@@ -8,7 +8,7 @@ working_dir = wbt.work_dir
 __all__ = ['inundation_extents',
            'inundation_extents_between']
 
-def inundation_extents(input_raster, output_name=None, output_raster_flag=True, output_polygons_flag=False, threshold):
+def inundation_extents(input_raster, threshold, output_name=None, output_raster_flag=True, output_polygons_flag=False):
     """
     Calculates inundation extents based on specific threshold
     
@@ -50,7 +50,7 @@ def inundation_extents(input_raster, output_name=None, output_raster_flag=True, 
 
 
 
-def inundation_extents_between(input_raster, output_name=None, output_raster_flag=True, output_polygons_flag=False low_threshold, high_threshold):
+def inundation_extents_between(input_raster, low_threshold, high_threshold, output_name=None, output_raster_flag=True, output_polygons_flag=False):
     """
     Calculates inundation extents between two threshold, based on low and high thresholds values.
     
