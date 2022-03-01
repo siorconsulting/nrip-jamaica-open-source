@@ -14,7 +14,7 @@ def print_work_dir():
 def set_work_dir(working_dir):
     wbt.work_dir = working_dir
 
-def inundation_extents(input_raster, threshold, output_name=None, output_raster_flag=True, output_polygons_flag=False):
+def inundation_extents(input_raster, threshold, output_name=None, output_raster_flag=True, output_polygons_flag=False, value=1):
     """
     Calculates inundation extents based on specific threshold
     
@@ -41,7 +41,7 @@ def inundation_extents(input_raster, threshold, output_name=None, output_raster_
     wbt.conditional_evaluation(i=input_raster, # string raster input from argugment of function
                                output=output_raster_name, # assigning temporary raster file string as output raster
                                statement=f"value <= {threshold}", # conditional Rust statement
-                               true = 1, # assigned value of gird cell if condition is met
+                               true = value, # assigned value of gird cell if condition is met
                                false = 'null') # assigned value of grid cell if condition is not met
     
     wbt.work_dir = working_dir
@@ -56,7 +56,7 @@ def inundation_extents(input_raster, threshold, output_name=None, output_raster_
 
 
 
-def inundation_extents_between(input_raster, low_threshold, high_threshold, output_name=None, output_raster_flag=True, output_polygons_flag=False):
+def inundation_extents_between(input_raster, low_threshold, high_threshold, output_name=None, output_raster_flag=True, output_polygons_flag=False, value=1):
     """
     Calculates inundation extents between two threshold, based on low and high thresholds values.
     
@@ -82,8 +82,8 @@ def inundation_extents_between(input_raster, low_threshold, high_threshold, outp
 
     wbt.conditional_evaluation(i=input_raster, # string raster input from argugment of function
                                output=output_raster_name, # assigning temporary raster file string as output raster
-                               statement=f"(value >= {low_threshold}) && (value < {high_threshold})", # conditional Rust statement
-                               true = 1, # assigned value of gird cell if condition is met
+                               statement=f"(value > {low_threshold}) && (value <= {high_threshold})", # conditional Rust statement
+                               true = value, # assigned value of gird cell if condition is met
                                false = 'null') # assigned value of grid cell if condition is not met
     
     wbt.work_dir = working_dir
