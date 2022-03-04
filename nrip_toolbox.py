@@ -1,4 +1,5 @@
 import os
+from re import L
 from tabnanny import verbose
 import whitebox
 
@@ -20,6 +21,10 @@ class nrip_toolbox:
 
     def set_verbose_mode(self, verbose_flag=False):
         self.wbt.verbose = verbose_flag
+
+    def reset_directories(self):
+        os.chdir = self.working_dir
+        self.wbt.work_dir = self.working_dir
 
     def inundation_extents(self, input_raster, threshold, output_name=None, output_raster_flag=True, output_polygons_flag=False, value=1):
         """
@@ -45,8 +50,8 @@ class nrip_toolbox:
 
         output_raster_name = f'{output_name}.tif' # string of temporary raster file
         output_polygons_name = f'{output_name}.shp' 
-        
-        self.wbt.work_dir = self.working_dir
+
+        self.reset_directories()
 
         self.wbt.conditional_evaluation(i=input_raster, # string raster input from argugment of function
                                 output=output_raster_name, # assigning temporary raster file string as output raster
@@ -54,12 +59,12 @@ class nrip_toolbox:
                                 true = value, # assigned value of gird cell if condition is met
                                 false = 'null') # assigned value of grid cell if condition is not met
         
-        self.wbt.work_dir = self.working_dir
+        self.reset_directories()
 
         if output_polygons_flag:
             self.wbt.raster_to_vector_polygons(i=output_raster_name, output=output_polygons_name) # converts temporary raster file to vector of polygon type
 
-        self.wbt.work_dir = self.working_dir
+        self.reset_directories()
         
         if not(output_raster_flag):
             os.remove(os.path.join(self.wbt.work_dir, output_raster_name)) # removes temporary raster file 
@@ -90,7 +95,7 @@ class nrip_toolbox:
         output_raster_name = f'{output_name}.tif' # string of temporary raster file
         output_polygons_name = f'{output_name}.shp' 
         
-        self.wbt.work_dir = self.working_dir
+        self.reset_directories()
 
         self.wbt.conditional_evaluation(i=input_raster, # string raster input from argugment of function
                                 output=output_raster_name, # assigning temporary raster file string as output raster
@@ -98,12 +103,12 @@ class nrip_toolbox:
                                 true = value, # assigned value of gird cell if condition is met
                                 false = 'null') # assigned value of grid cell if condition is not met
         
-        self.wbt.work_dir = self.working_dir
+        self.reset_directories()
 
         if output_polygons_flag:
             self.wbt.raster_to_vector_polygons(i=output_raster_name, output=output_polygons_name) # converts temporary raster file to vector of polygon type
 
-        self.wbt.work_dir = self.working_dir
+        self.reset_directories()
         
         if not(output_raster_flag):
             os.remove(os.path.join(self.wbt.work_dir, output_raster_name)) # removes temporary raster file 
