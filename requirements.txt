@@ -1,2 +1,2 @@
 geopandas==0.10.2
-whitebox==2.0.3
+whitebox==2.1.2
