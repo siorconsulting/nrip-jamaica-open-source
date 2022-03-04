@@ -23,7 +23,7 @@ class nrip_toolbox:
         self.wbt.verbose = verbose_flag
 
     def reset_directories(self):
-        os.chdir = self.working_dir
+        os.chdir(self.working_dir)
         self.wbt.work_dir = self.working_dir
 
     def inundation_extents(self, input_raster, threshold, output_name=None, output_raster_flag=True, output_polygons_flag=False, value=1):
