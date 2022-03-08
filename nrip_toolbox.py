@@ -241,7 +241,7 @@ class nrip_toolbox:
 
         if output_folder is not None:
             output_prefix = os.path.join(output_folder,output_prefix)
-            if not os.path.isdir():
+            if not os.path.isdir(output_folder):
                 os.mkdir(output_folder)
     
         out_fill = f"{output_prefix}_fill.tif"
