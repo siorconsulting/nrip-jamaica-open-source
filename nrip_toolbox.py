@@ -127,7 +127,8 @@ class nrip_toolbox:
     def hydrological_routing(self, dem, output_prefix, facc_threshold=1000, remove_temp_outputs=False):
 
         """
-        Performs the Hydrological Analysis on the input dem and calculates flow lines, basins and sinks derived from input dem
+        Performs complete hydrological routing workflow based on input Digital Elevation Model (DEM), including: 
+        fill depressions, flow direction, flow accumulation, flow lines, basins, fill extents. 
         
         Inputs:
             dem : str <-- path to raster(.tif) file
@@ -136,66 +137,78 @@ class nrip_toolbox:
             remove_temp_outputs : boolean <-- defaults to False, removes temporary outputs
 
         Outputs:
-            fill raster [temp] : temporary output generated for analysis
-            flow direction raster [temp] : temporary output generated for analysis
-            flow accumulation raster [temp] : temporary output generated for analysis
-            flow accumulation setnull raster [temp] : temporary output generated for analysis
-            flow accumulation setnull lines: str <-- output line(.shp) that represents flow accummulation lines
-            basins raster [temp]: temporary output generated for analysis
-            basins polygon : str <-- output polygon(.shp) that represents drainage basins
-            fill depth raster : str <-- output raster(.tif) that represents sinks
-            fill extent raster [temp] : temporary output generated for analysis
-            fill extent polygons :  str <-- output polygon(.shp) that represents sinks
+            fill raster [temp] : .tif <-- temporary output generated for analysis
+            flow direction raster [temp] : .tif <-- temporary output generated for analysis
+            flow accumulation raster [temp] : .tif <-- temporary output generated for analysis
+            flow accumulation threshold raster [temp] : .tif <-- temporary output generated for analysis
+            flow accumulation threshold lines: .shp <-- output line (.shp) that represents flow accummulation lines
+            basins raster [temp] : .tif <-- temporary output generated for analysis
+            basins polygon : .shp <-- output polygon(.shp) that represents drainage basins
+            fill depth raster : .tif <-- output raster(.tif) that represents sinks
+            fill extent raster [temp] : .tif <-- temporary output generated for analysis
+            fill extent polygons :  .shp <-- output polygon(.shp) that represents sinks
         
         Returns:
             None 
         
         """
-        
+
+        # Define names for output files
         out_fill = f"{output_prefix}_fill.tif"
         out_fdir = f"{output_prefix}_fdir.tif"
         out_facc = f"{output_prefix}_facc.tif"
-        out_facc_setnull = f"{output_prefix}_facc_setnull_{facc_threshold}.tif"
-        out_facc_setnull_lines = f"{output_prefix}_facc_setnull_polygon_{facc_threshold}.shp"
+        out_facc_setnull = f"{output_prefix}_facc_threshold_{facc_threshold}.tif"
+        out_facc_setnull_lines = f"{output_prefix}_facc_threshold_{facc_threshold}_polygons.shp"
         out_basins = f"{output_prefix}_basins.tif"
-        out_basins_polygon = f"{output_prefix}_basins_polygon.shp"
+        out_basins_polygon = f"{output_prefix}_basins_polygons.shp"
         out_calculator = f"{output_prefix}_fill_depth.tif"
         out_conditional = f"{output_prefix}_fill_extent.tif"
-        out_conditional_polygon = f"{output_prefix}_fill_extent_polygon.shp"
+        out_conditional_polygon = f"{output_prefix}_fill_extent_polygons.shp"
 
-        self.reset_directories()
+        self.reset_directories() 
 
+        # Fill depressions
         self.wbt.fill_depressions_planchon_and_darboux(dem, out_fill) # fills depressions of input raster
         self.reset_directories()
 
+        #  Calculate flow direction raster
         self.wbt.d8_pointer(out_fill, out_fdir, esri_pntr=True) # calcualtes flow direction from filled raster
         self.reset_directories()
 
+        # Calculate flow accumulation raster
         self.wbt.d8_flow_accumulation(out_fdir, out_facc, pntr=True, esri_pntr=True) # calculates flow accumulation from flow direction raster
         self.reset_directories()
 
+        # Apply flow accumulation threshold
         self.wbt.conditional_evaluation(i=out_facc, output=out_facc_setnull, statement=f"value >= {facc_threshold}", true=1, false='null') # provides evaluation on raster based on certain condtional statements
         self.reset_directories()
 
+        # Convert thresholded flow accumulation raster to vector lines
         self.wbt.raster_to_vector_lines(i=out_facc_setnull, output=out_facc_setnull_lines) # converts temporary buffered raster to lines
         self.reset_directories()
 
+        # Calculate basins / watersheds
         self.wbt.basins(out_fdir, out_basins, esri_pntr=True) # calculates basins by delineating all of the drainage basins and drainging to the edge of the data
         self.reset_directories()
 
+        # Calculate difference between DEM and filled DEM
         self.wbt.raster_calculator(output=out_calculator, statement=f"'{out_fill}'-'{dem}'") # performs comples mathematical operations on raster based on mathematical expression, or statement
         self.reset_directories()
 
+        # Identify areas where DEM has been filled
         self.wbt.conditional_evaluation(i=out_calculator, output=out_conditional, statement="value>0", true=1, false="null") # provides evaluation on raster based on certain condtional statements
         self.reset_directories()
 
+        # Convert filled areas raster to vector polygons
         self.wbt.raster_to_vector_polygons(i=out_basins, output=out_basins_polygon) # converts temporary buffered raster to polygons
         self.reset_directories()
         
+        # Cnvert basins raster to vector polugons
         self.wbt.raster_to_vector_polygons(i=out_conditional, output=out_conditional_polygon) # converts temporary buffered raster to polygons
         self.reset_directories()
 
         if remove_temp_outputs:
+            # Remove temporary outputs
             os.remove(os.path.join(self.wbt.work_dir,out_fill))
             os.remove(os.path.join(self.wbt.work_dir,out_fdir))
             os.remove(os.path.join(self.wbt.work_dir,out_facc))
@@ -208,15 +221,16 @@ class nrip_toolbox:
     ##### GEOMORPHOLOGICAL ANALYSIS #####
 
     #  Geomorphological Fluvial Flood Hazard Areas (Geomorphological Analysis)
-    def geomorphological_fluvial_flood_hazard_areas(self, dem, output_prefix, buffer_distance, facc_threshold = 1000, remove_temp_outputs = True):
+    def geomorphological_fluvial_flood_hazard_areas(self, dem, output_prefix, buffer_distance, facc_threshold = 1000, remove_temp_outputs = True, output_folder = None):
     
         """Calculates Flood hazard areas from raster and outputs these areas as polygons
         
         Inputs:
-            dem: str <-- path to raster(.tif) file
-            output_prefix: str <-- site specific name appended to each output file name
-            facc_threshold: int or float <-- flow accumulation threshold defaulted at 1000
-            buffer_distance: int or float <-- distance used to buffer flow accumulation raster
+            dem : str <-- path to raster(.tif) file
+            output_prefix : str <-- site specific name appended to each output file name
+            buffer_distance : int or float <-- distance used to buffer flow accumulation raster
+            facc_threshold : int or float <-- flow accumulation threshold (defaults to 1000)
+            remove_temp_areas <-- if True, temporary outputs are removed
         
         Outputs:
             out_facc_setnull_buffer_polygon: str <-- output polygon(.shp) that represents flood hazard areas
@@ -224,6 +238,11 @@ class nrip_toolbox:
         Returns:
             None
         """
+
+        if output_folder is not None:
+            output_prefix = os.path.join(output_folder,output_prefix)
+            if not os.path.isdir():
+                os.mkdir(output_folder)
     
         out_fill = f"{output_prefix}_fill.tif"
         out_fdir = f"{output_prefix}_fdir.tif"
@@ -251,11 +270,11 @@ class nrip_toolbox:
         self.reset_directories()
 
         if remove_temp_outputs: 
-            os.remove(os.path.join(self.wbt.work_dir,out_fill))
-            os.remove(os.path.join(self.wbt.work_dir,out_fdir))
-            os.remove(os.path.join(self.wbt.work_dir,out_facc))
-            os.remove(os.path.join(self.wbt.work_dir,out_facc_setnull))
-            os.remove(os.path.join(self.wbt.work_dir,out_facc_setnull_buffer))
+            os.remove(out_fill)
+            os.remove(out_fdir)
+            os.remove(out_facc)
+            os.remove(out_facc_setnull)
+            os.remove(out_facc_setnull_buffer)
   
         self.reset_directories()
 
