@@ -7,6 +7,7 @@ import geopandas as gpd
 class nrip_toolbox:
     """Class to be defined"""
 
+
     def __init__(self, working_directory=None, verbose=False):
         
         if working_directory is None:
@@ -29,7 +30,7 @@ class nrip_toolbox:
         os.chdir(self.working_dir)
         self.wbt.work_dir = self.working_dir
 
-    ##### INUNDATION ANALYSIS ######
+    ##### INUNDATION ANALYSIS #####
 
     # Inundation Extents (Inudation Analysis)
     def inundation_extents(self, input_raster, threshold, output_name=None, output_raster_flag=True, output_polygons_flag=False, value=1):
@@ -120,7 +121,7 @@ class nrip_toolbox:
         if not(output_raster_flag):
             os.remove(os.path.join(self.wbt.work_dir, output_raster_name)) # removes temporary raster file 
 
-    ##### HYDROLOGICAL ANALYSIS ######
+    ##### HYDROLOGICAL ANALYSIS #####
 
     # Hydrological Routing (Hydrological Analysis)
     def hydrological_routing(self, dem, output_prefix, facc_threshold=1000, remove_temp_outputs=False):
@@ -150,7 +151,7 @@ class nrip_toolbox:
             None 
         
         """
-
+        
         out_fill = f"{output_prefix}_fill.tif"
         out_fdir = f"{output_prefix}_fdir.tif"
         out_facc = f"{output_prefix}_facc.tif"
@@ -182,15 +183,17 @@ class nrip_toolbox:
         self.wbt.basins(out_fdir, out_basins, esri_pntr=True) # calculates basins by delineating all of the drainage basins and drainging to the edge of the data
         self.reset_directories()
 
-        # self.wbt.raster_to_vector_polygons(i=out_basins, output=out_basins_polygon) # converts temporary buffered raster to polygons
-
         self.wbt.raster_calculator(output=out_calculator, statement=f"'{out_fill}'-'{dem}'") # performs comples mathematical operations on raster based on mathematical expression, or statement
         self.reset_directories()
 
         self.wbt.conditional_evaluation(i=out_calculator, output=out_conditional, statement="value>0", true=1, false="null") # provides evaluation on raster based on certain condtional statements
         self.reset_directories()
 
-        # self.wbt.raster_to_vector_polygons(i=out_conditional, output=out_conditional_polygon) # converts temporary buffered raster to polygons
+        self.wbt.raster_to_vector_polygons(i=out_basins, output=out_basins_polygon) # converts temporary buffered raster to polygons
+        self.reset_directories()
+        
+        self.wbt.raster_to_vector_polygons(i=out_conditional, output=out_conditional_polygon) # converts temporary buffered raster to polygons
+        self.reset_directories()
 
         if remove_temp_outputs:
             os.remove(os.path.join(self.wbt.work_dir,out_fill))
@@ -202,7 +205,7 @@ class nrip_toolbox:
 
         self.reset_directories() 
 
-    ##### GEOMORPHOLOGICAL ANALYSIS ######
+    ##### GEOMORPHOLOGICAL ANALYSIS #####
 
     #  Geomorphological Fluvial Flood Hazard Areas (Geomorphological Analysis)
     def geomorphological_fluvial_flood_hazard_areas(self, dem, output_prefix, buffer_distance, facc_threshold = 1000, remove_temp_outputs = True):
@@ -302,7 +305,7 @@ class nrip_toolbox:
             os.remove(os.path.join(self.wbt.work_dir, slope_output)) # removes temporary slope output raster file
     
 
-    ##### GEOMETRIC ANALYSIS ######
+    ##### GEOMETRIC ANALYSIS #####
 
     # Intersect (Geometric Analysis)
     def intersect(self, input_vector_file, overlay, output_vector_file):
@@ -696,7 +699,7 @@ class nrip_toolbox:
     #  Summarise Within (Geometric Analysis)
     def summarize_within(self, input_vector, feature_polygons, output_polygon, field_to_summarize=None, aggfunc='mean'):
         """
-        Summarizies vector data relative to existing polygons
+        Summarizes vector data relative to existing polygons
 
         Inputs:
             input_vector: str <-- path to input vector(.shp) file. Can be point/lines/polygons
