@@ -221,7 +221,7 @@ class nrip_toolbox:
     ##### GEOMORPHOLOGICAL ANALYSIS #####
 
     #  Geomorphological Fluvial Flood Hazard Areas (Geomorphological Analysis)
-    def geomorphological_fluvial_flood_hazard_areas(self, dem, output_prefix, buffer_distance, facc_threshold = 1000, remove_temp_outputs = True, output_folder = None):
+    def geomorphological_fluvial_flood_hazard_areas(self, dem, output_prefix, buffer_distance, facc_threshold = 1000, remove_temp_outputs = True):
     
         """Calculates Flood hazard areas from raster and outputs these areas as polygons
         
@@ -239,10 +239,10 @@ class nrip_toolbox:
             None
         """
 
-        if output_folder is not None:
-            output_prefix = os.path.join(output_folder,output_prefix)
-            if not os.path.isdir(output_folder):
-                os.mkdir(output_folder)
+        # if output_folder is not None:
+        #     output_prefix = os.path.join(output_folder,output_prefix)
+        #     if not os.path.isdir(output_folder):
+        #         os.mkdir(output_folder)
     
         out_fill = f"{output_prefix}_fill.tif"
         out_fdir = f"{output_prefix}_fdir.tif"
@@ -251,15 +251,19 @@ class nrip_toolbox:
         out_facc_setnull_buffer = f"{output_prefix}_facc_setnull_buffer_{buffer_distance}.tif"
         out_facc_setnull_buffer_polygon = f"{output_prefix}_flood_hazard_areas.shp"
         
+        # Fill depressions
         self.wbt.fill_depressions_planchon_and_darboux(dem, out_fill) # fills depressions of input raster
         self.reset_directories()
 
+        # Calculate fLow direction
         self.wbt.d8_pointer(out_fill, out_fdir, esri_pntr=True) # calcualtes flow direction from filled raster
         self.reset_directories()
 
+        # Calculate flow accumulation
         self.wbt.d8_flow_accumulation(out_fdir, out_facc, pntr=True, esri_pntr=True) # calculates flow accumulation from flow direction raster
         self.reset_directories()
 
+        # 
         self.wbt.conditional_evaluation(i=out_facc, output=out_facc_setnull, statement=f"value >= {facc_threshold}", true=1, false='null') # provides evaluation on raster based on certain condtional statements
         self.reset_directories()
 
@@ -296,9 +300,9 @@ class nrip_toolbox:
             
         """
 
-        slope_output = f"{output_prefix}_slope.tif"            # defines
-        raster_output = f"{output_prefix}_slope_setnull.tif"   # output file 
-        polygon_output = f"{output_prefix}_slope_setnull.shp"  # names
+        slope_output = f"{output_prefix}_slope.tif"            
+        raster_output = f"{output_prefix}_slope_higher_than_{threshold}_deg.tif"   
+        polygon_output = f"{output_prefix}_slope_higher_than_{threshold}_deg.shp" 
 
         self.reset_directories()
         
