@@ -1,15 +1,12 @@
 import os
-# from re import L
-# from tabnanny import verbose
 import whitebox
 import geopandas as gpd
 
 class nrip_toolbox:
     """Class to be defined"""
 
-
     def __init__(self, working_directory=None, verbose=False):
-        
+
         if working_directory is None:
             self.working_dir = os.getcwd()
         else:
