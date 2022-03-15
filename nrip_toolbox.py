@@ -188,6 +188,10 @@ class nrip_toolbox:
         self.wbt.basins(out_fdir, out_basins, esri_pntr=True) # calculates basins by delineating all of the drainage basins and drainging to the edge of the data
         self.reset_directories()
 
+        # Convert basins raster to vector polygons 
+        self.wbt.raster_to_vector_polygons(i=out_basins, output=out_basins_polygon) # converts temporary buffered raster to polygons
+        self.reset_directories()
+
         # Calculate difference between DEM and filled DEM
         self.wbt.raster_calculator(output=out_calculator, statement=f"'{out_fill}'-'{dem}'") # performs comples mathematical operations on raster based on mathematical expression, or statement
         self.reset_directories()
@@ -197,12 +201,9 @@ class nrip_toolbox:
         self.reset_directories()
 
         # Convert filled areas raster to vector polygons
-        self.wbt.raster_to_vector_polygons(i=out_basins, output=out_basins_polygon) # converts temporary buffered raster to polygons
-        self.reset_directories()
-        
-        # Cnvert basins raster to vector polugons
         self.wbt.raster_to_vector_polygons(i=out_conditional, output=out_conditional_polygon) # converts temporary buffered raster to polygons
         self.reset_directories()
+        
 
         if remove_temp_outputs:
             # Remove temporary outputs
@@ -214,6 +215,178 @@ class nrip_toolbox:
             os.remove(os.path.join(self.wbt.work_dir,out_conditional)) 
 
         self.reset_directories() 
+
+    # Calulate Fill
+    def calculate_fill(self, inSurfaceRaster, outFillRatser, zLimit=None):
+        
+        """Fill depressions using the Planchon and Darboux method.
+        
+        Inputs:
+            inSurfaceRaster : Raster <-- path to input elevation raster file.
+            outFillRaster : Raster <-- path to output raster file.
+            zLimit (optional) : int <-- fill limit for sinks.
+        
+        Outputs:
+            Pass
+
+        Returns:
+            None    
+        """
+        
+        self.reset_directories() 
+
+        # Fill depressions
+        self.wbt.fill_depressions_planchon_and_darboux(inSurfaceRaster, outFillRatser, ) # fills depressions of input raster
+
+        self.reset_directories()
+    
+    # Calculate FLow Direction
+    def calculate_flow_direction(self, inFillRaster, outFlowDirRaster):
+        
+        """Calculate flow direction based on pre-conditioned (i.e. repression filled) digital elevation model (DEM). 
+        
+        Inputs:
+            inFillRaster : Raster <-- path to input filled DEM raster file.
+            outFlowDirRaster : Raster <-- path to output flow direction raster file.
+        
+        Outputs:
+            Pass
+
+        Returns:
+            None    
+        """
+        
+        self.reset_directories()
+
+        # Calculate flow direction raster
+        self.wbt.d8_pointer(inFillRaster, outFlowDirRaster, esri_pntr=True) # calcualtes flow direction from filled raster
+        self.reset_directories()
+  
+    # Calculate Flow Accumulation
+    def calculate_flow_accumulation(self, inFlowDirRaster, outFlowAccRaster):
+        
+        """Calculate flow accumulation based on flow direction raster. 
+        
+        Inputs:
+            inFillRaster : Raster <-- path to input flow direction raster file.
+            outFlowDirRaster : Raster <-- path to output flow accumulation raster file.
+        
+        Outputs:
+            Pass
+
+        Returns:
+            None    
+        """
+
+        self.reset_directories()
+
+        # Calculate flow accumulation raster
+        self.wbt.d8_flow_accumulation(inFlowDirRaster, outFlowAccRaster, pntr=True, esri_pntr=True) # calculates flow accumulation from flow direction raster
+        self.reset_directories()
+
+    # Calculate Flow Network
+    def calculate_flow_network(self, inFlowAccRatser, outFlowAccThresholdLines, FlowAccThreshold=1000, remove_temp_outputs=False):
+        """Calculate flow drainage network based on flow accumulation threshold value. 
+        
+        Inputs:
+            inFlowAccRatser : Raster <-- path to input flow accumulation raster file.
+            outFlowAccThresholdLines : Shapefile <-- path to output flow drainage network vector (lines) file (.shp)
+            FlowAccThreshold : int or float <-- flow accummulation threshold value
+            remove_temp_outputs : boolean <-- defaults to False, removes temporary outputs
+
+        Ouputs:
+            Pass
+
+        Returns:
+            None
+
+        """
+
+        outFlowAccThresholdRaster = "temp_outFLowAccThresholdRaster.tif"
+
+        # Apply flow accumulation threshold
+        self.wbt.conditional_evaluation(i=inFlowAccRatser, output=outFlowAccThresholdRaster, statement=f"value >= {FlowAccThreshold}", true=1, false='null') # provides evaluation on raster based on certain condtional statements
+        self.reset_directories()
+
+        # Convert thresholded flow accumulation raster to vector lines
+        self.wbt.raster_to_vector_lines(i=outFlowAccThresholdRaster, output=outFlowAccThresholdLines) # converts temporary buffered raster to lines
+        self.reset_directories()
+
+        if remove_temp_outputs:
+            # Remove temporary outputs
+            os.remove(outFlowAccThresholdRaster)
+    
+    # Calculate Watersheds
+    def calculate_basins(self, inFlowDirRaster, outBasinsPolygons, remove_temp_outputs=False):
+        
+        """Calculate basins based on flow direction threshold value. 
+        
+        Inputs:
+            inFlowDirRaster : Raster <-- path to input flow direction raster file.
+            outBasinsPolygons : Shapefile <-- path to output basins vector (polygons) file (.shp)
+            remove_temp_outputs : boolean <-- defaults to False, removes temporary outputs
+
+        Ouputs:
+            Pass
+
+        Returns:
+            None
+
+        """
+
+        outBasinsRaster = "temp_outBasinsRaster.tif"
+
+        self.reset_directories()
+
+        # Calculate basins / watersheds
+        self.wbt.basins(inFlowDirRaster, outBasinsRaster, esri_pntr=True) # calculates basins by delineating all of the drainage basins and drainging to the edge of the data
+        self.reset_directories()
+
+        # Convert basins raster to vector polygons 
+        self.wbt.raster_to_vector_polygons(i=outBasinsRaster, output=outBasinsPolygons) # converts temporary buffered raster to polygons
+        self.reset_directories()
+
+        if remove_temp_outputs:
+            # Remove temporary outputs
+            os.remove(outBasinsRaster)
+
+    # Calculate filled areas
+    def calculate_filled_areas(self, inSurfaceRaster, inFillRaster, outFilledAreasPolygons, remove_temp_outputs=False):
+
+        """Calculate filled areas based on original and filled digital elevaiton model (DEM) rasters.
+        
+        Inputs:
+            inSurfaceRaster : Raster <-- path to input DEM raster file.
+            inFillRaster : Shapefile <-- path to input filled DEM raster file.
+            remove_temp_outputs : boolean <-- defaults to False, removes temporary outputs
+
+        Ouputs:
+            Pass
+
+        Returns:
+            None
+
+        """
+        
+        outDifferenceRaster = "temp_outDifferenceRaster.tif"
+        outConditionalRaster = "temp_outConditionalRaster.tif"
+
+        # Calculate difference between DEM and filled DEM
+        self.wbt.raster_calculator(output=outDifferenceRaster, statement=f"'{inFillRaster}'-'{inSurfaceRaster}'") # performs comples mathematical operations on raster based on mathematical expression, or statement
+        self.reset_directories()
+
+        # Identify areas where DEM has been filled
+        self.wbt.conditional_evaluation(i=outDifferenceRaster, output=outConditionalRaster, statement="value>0", true=1, false="null") # provides evaluation on raster based on certain condtional statements
+        self.reset_directories()
+
+        # Convert filled areas raster to vector polygons
+        self.wbt.raster_to_vector_polygons(i=outConditionalRaster, output=outFilledAreasPolygons) # converts temporary buffered raster to polygons
+        self.reset_directories()
+
+        if remove_temp_outputs:
+            # Remove temporary outputs
+            os.remove(outDifferenceRaster)
+            os.remove(outConditionalRaster)
 
     ##### GEOMORPHOLOGICAL ANALYSIS #####
 
