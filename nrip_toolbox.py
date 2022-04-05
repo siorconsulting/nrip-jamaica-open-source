@@ -573,6 +573,7 @@ class nrip_toolbox:
         Inputs:
             input_points: str <-- path to input point (.shp) file
             output_raster: str <-- raster(.tif) file name
+            raster_cell_size: int or float <-- cell size for output raster file
 
         Outputs: 
             output_raster: raster <-- raster(.tif) file
@@ -617,6 +618,7 @@ class nrip_toolbox:
         Inputs: 
             input_lines: str <-- path to input point(.shp) file
             output_raster: str <-- raster(.tif) file name
+            raster_cell_size: int or float <-- cell size for output raster file
 
         Outputs:
             output_raster: raster <-- raster(.tif) file
@@ -661,6 +663,7 @@ class nrip_toolbox:
         Inputs:
             input_polygons: str <-- path to input polygon(.shp) file
             output_raster: str <-- raster(.tif) file name
+            raster_cell_size: int or float <-- cell size for output raster file
 
         Outputs:
             output_raster: raster <-- output raster(.tif) file
