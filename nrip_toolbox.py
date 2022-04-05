@@ -437,9 +437,11 @@ class nrip_toolbox:
         self.wbt.conditional_evaluation(i=out_facc, output=out_facc_setnull, statement=f"value >= {facc_threshold}", true=1, false='null') # provides evaluation on raster based on certain condtional statements
         self.reset_directories()
 
+        # 
         self.wbt.buffer_raster(out_facc_setnull, out_facc_setnull_buffer, size=buffer_distance) # buffers raster by specific distance
         self.reset_directories()
 
+        # 
         self.wbt.raster_to_vector_polygons(out_facc_setnull_buffer, out_facc_setnull_buffer_polygon) # converts temporary buffered raster to polygons
         self.reset_directories()
 
