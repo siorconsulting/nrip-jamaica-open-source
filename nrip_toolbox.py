@@ -18,6 +18,8 @@ class nrip_toolbox:
 
         self.wbt.verbose = verbose
 
+        self.shp_ext_list = ['shp', 'shx', 'dbf', 'prj', 'cpg']
+
     # Set Verbose Mode
     def set_verbose_mode(self, verbose_flag=False):
         self.wbt.verbose = verbose_flag
@@ -564,7 +566,7 @@ class nrip_toolbox:
         self.reset_directories()
     
     # Distance From Points (Geometric Analysis)   
-    def distance_from_points(self,input_points, output_raster):
+    def distance_from_points(self,input_points, output_raster, raster_cell_size = 1):
         """
         Creates new raster showing distances between input points
 
@@ -590,7 +592,7 @@ class nrip_toolbox:
         input_raster = 'temp_input_raster.tif' # assigning file name
         input_raster_zeros = 'temp_input_raster_zeros.tif'
         
-        self.wbt.vector_points_to_raster(temp_input_points,input_raster,field='FID_wbt', cell_size=100) # points to raster transformation
+        self.wbt.vector_points_to_raster(temp_input_points,input_raster,field='FID_wbt', cell_size=raster_cell_size) # points to raster transformation
         self.reset_directories()
 
         self.wbt.convert_nodata_to_zero(input_raster, input_raster_zeros)
@@ -601,12 +603,14 @@ class nrip_toolbox:
 
         os.remove(os.path.join(self.wbt.work_dir, input_raster)) # removes temporary raster file
         os.remove(os.path.join(self.wbt.work_dir, input_raster_zeros))
-        os.remove(os.path.join(self.wbt.work_dir, temp_input_points))
+
+        for ext in self.shp_ext_list:
+            os.remove(os.path.join(self.wbt.work_dir, temp_input_points[:-3] + ext))
         
         self.reset_directories()
 
     # Distance From Lines
-    def distance_from_lines(self,input_lines, output_raster):
+    def distance_from_lines(self,input_lines, output_raster, raster_cell_size = 1):
         """
         Creates new raster showing distances between lines
 
@@ -632,7 +636,7 @@ class nrip_toolbox:
         input_raster = 'temp_input_raster.tif'  # assigning file name
         temp_input_raster_zeros = 'temp_input_raster_zeros.tif'
         
-        self.wbt.vector_lines_to_raster(temp_input_lines, input_raster,field='FID_wbt', cell_size=100) # lines to raster transformation
+        self.wbt.vector_lines_to_raster(temp_input_lines, input_raster,field='FID_wbt', cell_size=raster_cell_size) # lines to raster transformation
         self.reset_directories()
         
         self.wbt.convert_nodata_to_zero(input_raster,temp_input_raster_zeros)
@@ -642,12 +646,15 @@ class nrip_toolbox:
         self.reset_directories()
 
         os.remove(os.path.join(self.wbt.work_dir,input_raster)) # removes temporary raster file
-        os.remove(os.path.join(self.wbt.work_dir,temp_input_lines))
         os.remove(os.path.join(self.wbt.work_dir,temp_input_raster_zeros))
+
+        for ext in self.shp_ext_list:
+            os.remove(os.path.join(self.wbt.work_dir, temp_input_lines[:-3] + ext))
+
         self.reset_directories()
 
     # Distance From Polygons 
-    def distance_from_polygons(self, input_polygons, output_raster):
+    def distance_from_polygons(self, input_polygons, output_raster, raster_cell_size = 1):
         """
         Creates new raster showing distances between polygons
 
@@ -672,7 +679,7 @@ class nrip_toolbox:
         gdf.to_file(temp_input_polygons)
 
         input_raster = 'temp_input_raster.tif' # assigning file name
-        self.wbt.vector_polygons_to_raster(temp_input_polygons ,input_raster, field='FID_wbt', cell_size = 100) # polygons to raster transformation
+        self.wbt.vector_polygons_to_raster(temp_input_polygons ,input_raster, field='FID_wbt', cell_size = raster_cell_size) # polygons to raster transformation
         self.reset_directories()
 
         self.wbt.convert_nodata_to_zero(input_raster, temp_input_raster_zeros)
@@ -682,8 +689,11 @@ class nrip_toolbox:
         self.reset_directories()
 
         os.remove(os.path.join(self.wbt.work_dir,input_raster)) # removes temporary raster file
-        os.remove(os.path.join(self.wbt.work_dir,temp_input_polygons))
         os.remove(os.path.join(self.wbt.work_dir,temp_input_raster_zeros))
+
+        for ext in self.shp_ext_list:
+            os.remove(os.path.join(self.wbt.work_dir, temp_input_polygons[:-3] + ext))
+
         self.reset_directories()
 
     # Distance From Raster (Geometric Analysis)
